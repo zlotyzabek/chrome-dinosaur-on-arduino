@@ -13,6 +13,7 @@ unsigned long long jump_reload = 0;
 int old_cactus = 1;
 int score = 0;
 bool lose = false;
+bool lose_finish = false;
 
 byte dinosaur[] = {
   B01110,
@@ -69,7 +70,6 @@ void update_cactus(){
       lcd.setCursor(i +1, 1);
       lcd.println(" ");
       old_cactus = cactus_x[i];
-      Serial.print(cactus_x[i]);
       cactus_x[i] = 0;
       if(i > 0);
         cactus_x[i - 1] = old_cactus;
@@ -81,21 +81,14 @@ void update_cactus(){
           
       if(i == 2 and cactus_x[i - 1] > 0){
         if (jumpTime < millis()){
-          score = 0;
           lcd.clear();
           lcd.setCursor(10, 0);
           lcd.print("LOSE ");
-          lcd.setCursor(0, 1);
-          lcd.print("SCORE: ");
           updateCactus = 0xFFFFFFFFFFFFFFF;
           lose = true;
           }
         }
-      if (lose == false){
-          lcd.setCursor(10, 0);
-          lcd.print(score);
-        
-        }
+     
   }
   
   }
@@ -106,6 +99,7 @@ void loop() {
     cactusTimeRespawn = millis() + random(1000, 2500);
       add_cactus();
     }
+  if (lose == false){
   if (ButtonClick == 0 and isjumping == 0 and jump_reload < millis()){
     isjumping = 1;
     jumpTime = millis() + 1000;
@@ -115,6 +109,8 @@ void loop() {
     isjumping = 0;
     
     }
+  }
+  if (lose == false){
   if (jumpTime < millis()){
     lcd.setCursor(2, 1);
     lcd.write(byte(0));
@@ -134,5 +130,20 @@ void loop() {
     update_cactus();
     score ++;
   }
+  }
+   if (lose == false){
+          lcd.setCursor(10, 0);
+          lcd.print(score);
+        
+        }
+   if (lose == true and lose_finish == false){
+          lcd.clear();
+          lcd.setCursor(0, 1);
+          lcd.print(score);
+          Serial.println(score);
+          lcd.setCursor(0, 0);
+          lcd.print("SCORE: ");
+          lose_finish = true;
+        }
   delay(10);
 }
